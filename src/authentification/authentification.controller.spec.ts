@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthentificationController } from './authentification.controller';
+import { AuthentificationController } from './AuthentificationController';
 import { AuthentificationService } from './authentification.service';
 
 describe('AuthentificationController', () => {
@@ -11,7 +11,9 @@ describe('AuthentificationController', () => {
       providers: [AuthentificationService],
     }).compile();
 
-    controller = module.get<AuthentificationController>(AuthentificationController);
+    controller = module.get<AuthentificationController>(
+      AuthentificationController,
+    );
   });
 
   it('should be defined', () => {

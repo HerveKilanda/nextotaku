@@ -6,6 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  
+  UseGuards,
 } from '@nestjs/common';
 import { AuthentificationService } from './authentification.service';
 import { inscriptionDto } from './dto/inscription';
@@ -13,6 +16,9 @@ import { UpdateAuthentificationDto } from './dto/update-authentification.dto';
 import { connexionDto } from './dto/connextion';
 import { ResetPasswordDto } from './dto/resetPassword';
 import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import { deleteAccountDto } from './dto/deleteAccount';
 
 
 
@@ -38,9 +44,11 @@ export class AuthentificationController {
     return this.AuthentificationService.resetPasswordConfimation(resetPasswordConfirmationDto);
   }
  
+  @UseGuards(AuthGuard("jwt"))
   @Delete("delete")
-  deleteAccount(){
-    return "compte supprimer"
+  deleteAccount(@Req() request : Request, @Body() deteleAccountDto: deleteAccountDto ){
+    const userId =  request.user["userid"]
+    return this.AuthentificationService.deleteAccount(userId, deteleAccountDto);
   }
     
   

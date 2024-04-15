@@ -18,6 +18,7 @@ import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from './dto/resetPassword';
 import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation';
 import { Prisma } from '@prisma/client';
+import { deleteAccountDto } from './dto/deleteAccount';
 
 @Injectable()
 export class AuthentificationService {
@@ -174,7 +175,7 @@ export class AuthentificationService {
     if (!match) {
       throw new UnauthorizedException('Le token est invalide ou expiré');
     }
-     const hash = await bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(password, 10);
     // Mise à jour du mot de passe de l'utilisateur dans la base de données
     await this.prismaService.users.update({
       where: { email: email }, // Utilisez le bon champ de filtrage
@@ -183,5 +184,20 @@ export class AuthentificationService {
 
     // Retour d'un message de succès
     return { data: 'Mot de passe mis à jour avec succès' };
+  }
+
+  async deleteAccount(userId: number, deleteAccountDto: deleteAccountDto) {
+    // Recherche de l'utilisateur dans la base de données par e-mail
+    const user = await this.prismaService.users.findUnique({
+      where: { id : userId },
+    });
+    // Vérification si l'utilisateur existe
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+    await this.prismaService.users.delete({
+      where:{id: userId}
+    })
+    return {data : "Le compte a été supprimé"}
   }
 }
