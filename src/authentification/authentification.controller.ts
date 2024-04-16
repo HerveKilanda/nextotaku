@@ -17,7 +17,7 @@ import { connexionDto } from './dto/connextion';
 import { ResetPasswordDto } from './dto/resetPassword';
 import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { request, Request } from 'express';
 import { deleteAccountDto } from './dto/deleteAccount';
 
 
@@ -25,7 +25,9 @@ import { deleteAccountDto } from './dto/deleteAccount';
 
 @Controller('auth')
 export class AuthentificationController {
-  constructor(private readonly AuthentificationService: AuthentificationService) {}
+  constructor(
+    private readonly AuthentificationService: AuthentificationService,
+  ) {}
 
   @Post('inscription')
   inscrption(@Body() inscriptionDto: inscriptionDto) {
@@ -35,23 +37,32 @@ export class AuthentificationController {
   connexion(@Body() connexionDto: connexionDto) {
     return this.AuthentificationService.connexion(connexionDto);
   }
-  @Post("reset-password")
-  resetPassword(@Body() resetPasswordDto : ResetPasswordDto){
+  @Post('reset-password')
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.AuthentificationService.resetPassword(resetPasswordDto);
   }
-  @Post("reset-password-confirmation")
-  resetPasswordConfirmation(@Body() resetPasswordConfirmationDto : ResetPasswordConfirmationDto){
-    return this.AuthentificationService.resetPasswordConfimation(resetPasswordConfirmationDto);
+  @Post('reset-password-confirmation')
+  resetPasswordConfirmation(
+    @Body() resetPasswordConfirmationDto: ResetPasswordConfirmationDto,
+  ) {
+    return this.AuthentificationService.resetPasswordConfimation(
+      resetPasswordConfirmationDto,
+    );
   }
- 
-  @UseGuards(AuthGuard("jwt"))
-  @Delete("delete")
-  deleteAccount(@Req() request : Request, @Body() deteleAccountDto: deleteAccountDto ){
-    const userId =  request.user["userid"]
-    return this.AuthentificationService.deleteAccount(userId, deteleAccountDto);
+  @Delete(':id')
+  deleteUser(
+    @Param('id') id: string,
+    @Body() deleteAccountDto: deleteAccountDto,
+  ) {
+    return this.AuthentificationService.deleteUser(
+      Number(id),
+      deleteAccountDto,
+    );
   }
+}
+
     
   
 
 
-}
+

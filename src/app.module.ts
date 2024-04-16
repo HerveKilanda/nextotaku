@@ -10,6 +10,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from './mailer/mailer.module';
+import { JwtModule } from '@nestjs/jwt';
 
 
 
@@ -24,6 +25,7 @@ import { MailerModule } from './mailer/mailer.module';
     PrismaModule,
     ConfigModule.forRoot({isGlobal: true}),
     MailerModule,
+    JwtModule
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

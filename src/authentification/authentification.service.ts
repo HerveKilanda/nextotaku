@@ -186,18 +186,33 @@ export class AuthentificationService {
     return { data: 'Mot de passe mis à jour avec succès' };
   }
 
-  async deleteAccount(userId: number, deleteAccountDto: deleteAccountDto) {
-    // Recherche de l'utilisateur dans la base de données par e-mail
+  async deleteUser(id: number, deleteAccountDto: deleteAccountDto) {
+    // Recherche de l'utilisateur dans la base de données par ID
     const user = await this.prismaService.users.findUnique({
-      where: { id : userId },
+      where: { id },
     });
+
     // Vérification si l'utilisateur existe
     if (!user) {
       throw new NotFoundException('Utilisateur non trouvé');
     }
+
+    // Comparaison du mot de passe fourni avec le mot de passe hashé de l'utilisateur
+    const match = await bcrypt.compare(
+      deleteAccountDto.password,
+      user.password,
+    );
+    if (!match) {
+      throw new UnauthorizedException(
+        'Les mots de passe ne sont pas identiques',
+      );
+    }
+
+    // Suppression de l'utilisateur de la base de données
     await this.prismaService.users.delete({
-      where:{id: userId}
-    })
-    return {data : "Le compte a été supprimé"}
+      where: { id },
+    });
+
+    return { data: 'Le compte a été supprimé' };
   }
 }
