@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MailerService } from 'src/mailer/mailer.service';
 import { connexionDto } from './dto/connextion';
-import { User } from 'src/users/entities/user.entity';
+
 import { JwtService } from '@nestjs/jwt';
 import * as speakeasy from 'speakeasy';
 import { create } from 'domain';
@@ -39,7 +39,7 @@ export class AuthentificationService {
     const { email, password, username } = inscriptionDto;
 
     // Recherche de l'utilisateur dans la base de données par e-mail
-    const user = await this.prismaService.users.findFirst({
+    const user = await this.prismaService.user.findFirst({
       where: { email: email },
     });
 
@@ -55,7 +55,7 @@ export class AuthentificationService {
     const hash = await bcrypt.hash(password, 10);
 
     // Création d'un nouvel utilisateur dans la base de données
-    await this.prismaService.users.create({
+    await this.prismaService.user.create({
       data: { username, email, password: hash },
     });
 
@@ -66,7 +66,7 @@ export class AuthentificationService {
   }
   async connexion(connexionDto: connexionDto) {
     const { email, password } = connexionDto;
-    const user = await this.prismaService.users.findFirst({
+    const user = await this.prismaService.user.findFirst({
       where: { email: email },
     });
     if (!user) {
@@ -80,7 +80,7 @@ export class AuthentificationService {
       );
     }
     const payload = {
-      sub: user.id,
+      sub: user.userId,
       email: user.email,
     };
 
@@ -109,13 +109,13 @@ export class AuthentificationService {
     const { email } = ResetPasswordDto;
 
     // Recherche de l'utilisateur dans la base de données par e-mail
-    const user = await this.prismaService.users.findFirst({
+    const user = await this.prismaService.user.findFirst({
       where: { email: email },
     });
 
     // Vérification si l'utilisateur existe
     if (!user) {
-      // Si l'utilisateur n'existe pas, une exception est lancée
+      // Si l'utilisateur n'existe pas, une exception est lancé
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
 
@@ -153,9 +153,9 @@ export class AuthentificationService {
     const { email, password, code } = ResetPasswordConfirmationDto;
 
     // Recherche de l'utilisateur dans la base de données par e-mail
-    const user = await this.prismaService.users.findUnique({
-      where: { email: email },
-    });
+     const user = await this.prismaService.user.findFirst({
+       where: { email: email },
+     });
 
     // Vérification si l'utilisateur existe
     if (!user) {
@@ -177,7 +177,7 @@ export class AuthentificationService {
     }
     const hash = await bcrypt.hash(password, 10);
     // Mise à jour du mot de passe de l'utilisateur dans la base de données
-    await this.prismaService.users.update({
+    await this.prismaService.user.update({
       where: { email: email }, // Utilisez le bon champ de filtrage
       data: { password: hash }, // Mettez à jour le mot de passe avec le nouveau mot de passe
     });
@@ -186,10 +186,10 @@ export class AuthentificationService {
     return { data: 'Mot de passe mis à jour avec succès' };
   }
 
-  async deleteUser(id: number, deleteAccountDto: deleteAccountDto) {
+  async deleteUser(userId: number, deleteAccountDto: deleteAccountDto) {
     // Recherche de l'utilisateur dans la base de données par ID
-    const user = await this.prismaService.users.findUnique({
-      where: { id },
+    const user = await this.prismaService.user.findUnique({
+      where: { userId },
     });
 
     // Vérification si l'utilisateur existe
@@ -209,8 +209,8 @@ export class AuthentificationService {
     }
 
     // Suppression de l'utilisateur de la base de données
-    await this.prismaService.users.delete({
-      where: { id },
+    await this.prismaService.user.delete({
+      where: { userId },
     });
 
     return { data: 'Le compte a été supprimé' };

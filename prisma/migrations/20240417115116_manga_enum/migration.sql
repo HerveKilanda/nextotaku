@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `manga` ADD COLUMN `status` ENUM('LIBRE', 'EMPRUNTE') NOT NULL DEFAULT 'LIBRE';

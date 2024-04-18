@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Req,
-  
   UseGuards,
 } from '@nestjs/common';
 import { AuthentificationService } from './authentification.service';
@@ -19,9 +18,6 @@ import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation';
 import { AuthGuard } from '@nestjs/passport';
 import { request, Request } from 'express';
 import { deleteAccountDto } from './dto/deleteAccount';
-
-
-
 
 @Controller('auth')
 export class AuthentificationController {
@@ -50,19 +46,12 @@ export class AuthentificationController {
     );
   }
   @Delete(':id')
-  deleteUser(
-    @Param('id') id: string,
-    @Body() deleteAccountDto: deleteAccountDto,
-  ) {
-    return this.AuthentificationService.deleteUser(
-      Number(id),
-      deleteAccountDto,
-    );
+  @UseGuards(AuthGuard('jwt'))
+  deleteUser(@Param('id') id: string,@Body() deleteAccountDto: deleteAccountDto,){
+     return this.AuthentificationService.deleteUser(
+       Number(id),
+       deleteAccountDto,
+     );
   }
-}
-
-    
-  
-
-
+  }
 

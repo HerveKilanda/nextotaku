@@ -37,7 +37,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @returns Utilisateur correspondant à l'email présent dans le jeton JWT
    */
   async validate(payload: Payload) {
-    const user = await this.prismaService.users.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: { email: payload.email },
     });
     if (!user) {

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { EmpruntModule } from './emprunt/emprunt.module';
 import { MangaModule } from './manga/manga.module';
 import { CategorieModule } from './categorie/categorie.module';
@@ -17,7 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    UsersModule,
+    
     EmpruntModule,
     MangaModule,
     CategorieModule,
