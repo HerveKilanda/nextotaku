@@ -2,9 +2,9 @@
 
 ---
 
-# MangaLinker
+# Otakulinks
 
-MangaLinker est une application web permettant de gérer les emprunts de mangas dans une bibliothèque. Elle offre une plateforme conviviale pour les utilisateurs afin de rechercher, emprunter et gérer leurs emprunts de mangas préférés.
+Otakulinks est une application web permettant de gérer les emprunts de mangas dans une bibliothèque. Elle offre une plateforme conviviale pour les utilisateurs afin de rechercher, emprunter et gérer leurs emprunts de mangas préférés.
 
 ## Fonctionnalités
 
