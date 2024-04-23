@@ -9,7 +9,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { MangaService } from './manga.service';
+import {  MangaService } from './manga.service';
 import { CreateMangaDto } from './dto/create-manga.dto';
 import { UpdateMangaDto } from './dto/update-manga.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -51,7 +51,7 @@ export class MangaController {
    */
   @Get(':id')
   findOne(@Param('id') userId: string) {
-    return this.mangaService.findOne(+userId);
+    return this.mangaService.MangafindOne(+userId);
   }
 
   /**

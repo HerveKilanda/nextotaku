@@ -35,6 +35,9 @@ model Emprunt {
   mangaId    Int
   user       User   @relation(fields: [userId], references: [userId])
   userId     Int
+   dateDebut  DateTime @default(now())
+  dateFin    DateTime 
+  
 }
 
 model User {

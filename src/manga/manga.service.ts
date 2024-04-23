@@ -8,6 +8,7 @@ import { CreateMangaDto } from './dto/create-manga.dto';
 import { UpdateMangaDto } from './dto/update-manga.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Manga } from './entities/manga.entity';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class MangaService {
@@ -20,9 +21,9 @@ export class MangaService {
    * @returns Un message indiquant que le manga a été créé avec succès.
    */
   async createManga(createMangaDto: CreateMangaDto, userId: any) {
-    const { titre, description, categorieId } = createMangaDto;
+    const { titre, description, categorieId, } = createMangaDto;
     await this.prisma.manga.create({
-      data: { titre, description, categorieId, userId },
+      data: { titre, description, categorieId, userId, },
     });
     return { data: 'Manga créé' };
   }
@@ -32,7 +33,7 @@ export class MangaService {
    * @returns Tous les mangas disponibles.
    */
   async getAllManga(): Promise<Manga[]> {
-    return await this.prisma.manga.findMany();
+    return await this.prisma.manga.findMany({ where : {status : Status.LIBRE}});
   }
 
   /**
@@ -40,7 +41,7 @@ export class MangaService {
    * @param mangaId L'ID du manga à récupérer.
    * @returns Le manga correspondant à l'ID fourni.
    */
-  async findOne(mangaId: number): Promise<Manga | null> {
+  async MangafindOne(mangaId: number): Promise<Manga | null> {
     return await this.prisma.manga.findFirst({ where: { mangaId } });
   }
 
