@@ -1,24 +1,20 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Param,
 } from '@nestjs/common';
-import { Emprunt, Prisma, Status } from '@prisma/client';
+import { Emprunt, Status } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEmpruntDto } from './dto/create-emprunt.dto';
 import { UpdateEmpruntDto } from './dto/update-emprunt.dto';
 
 @Injectable()
 export class EmpruntService {
-  checkEmpruntExists(arg0: number) {
-    throw new Error('Method not implemented.');
-  }
+ 
   constructor(private readonly prismaService: PrismaService) {}
 
   // Méthode pour créer un nouvel emprunt
@@ -93,6 +89,15 @@ export class EmpruntService {
    * @throws {HttpException} - Si l'emprunt n'est pas trouvé.
    */
   async update(empruntsId: number, updateEmpruntDto: UpdateEmpruntDto) {
+    // Check if the emprunt exists
+    const existingEmprunt = await this.prismaService.emprunt.findUnique({
+      where: { empruntsId },
+    });
+
+    if (!existingEmprunt) {
+      throw new NotFoundException('Emprunt not found');
+    }
+
     try {
       // Get the current date
       const currentDate = new Date();
@@ -108,7 +113,7 @@ export class EmpruntService {
       return updatedEmprunt;
     } catch (error) {
       console.error(error);
-      throw new NotFoundException('Emprunt not found');
+      throw new InternalServerErrorException('Failed to update emprunt');
     }
   }
 
@@ -125,11 +130,12 @@ export class EmpruntService {
     });
 
     if (!deletedEmprunt) {
-      throw new HttpException("L'emprunt n'a pas été trouvé", HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        "L'emprunt n'a pas été trouvé",
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return { message: "L'emprunt a été supprimé" };
   }
 }
-     
-

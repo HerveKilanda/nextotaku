@@ -7,19 +7,19 @@ import { UpdateCategorieDto } from './dto/update-categorie.dto';
 export class CategorieController {
   constructor(private readonly categorieService: CategorieService) {}
 
-  @Post()
-  create(@Body() createCategorieDto: CreateCategorieDto) {
-    return this.categorieService.create(createCategorieDto);
+  @Post("create")
+  async create(@Body() createCategorieDto: CreateCategorieDto) {
+    return await this.categorieService.create(createCategorieDto);
   }
 
-  @Get()
-  findAll() {
-    return this.categorieService.findAll();
+  @Get("all")
+  async findAll() {
+    return await this.categorieService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categorieService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.categorieService.findOne(+id);
   }
 
   @Patch(':id')
