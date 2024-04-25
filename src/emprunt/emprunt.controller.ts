@@ -19,7 +19,10 @@ import { EmpruntService } from './emprunt.service';
 import { Emprunt } from '@prisma/client';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('emprunt')
 @Controller('emprunt')
 export class EmpruntController {
   constructor(private readonly empruntService: EmpruntService) {}
@@ -29,6 +32,7 @@ export class EmpruntController {
     return this.empruntService.create(createEmpruntDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('all')
   async findAllEmprunt(userId: number, mangaId: number) {
     try {
@@ -42,6 +46,7 @@ export class EmpruntController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async updateEmprunt(
     @Param('id', ParseIntPipe) empruntsId: number,

@@ -14,7 +14,10 @@ import { CreateMangaDto } from './dto/create-manga.dto';
 import { UpdateMangaDto } from './dto/update-manga.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('manga')
 @Controller('manga')
 export class MangaController {
   constructor(private readonly mangaService: MangaService) {}
@@ -39,6 +42,7 @@ export class MangaController {
    * Récupère tous les mangas.
    * @returns Tous les mangas disponibles.
    */
+  @UseGuards(AuthGuard('jwt'))
   @Get('get')
   getAllManga() {
     return this.mangaService.getAllManga();

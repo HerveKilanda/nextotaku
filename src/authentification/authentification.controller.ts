@@ -3,7 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
+  InternalServerErrorException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -18,7 +22,10 @@ import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation';
 import { AuthGuard } from '@nestjs/passport';
 import { request, Request } from 'express';
 import { deleteAccountDto } from './dto/deleteAccount';
+import { ExternalExceptionFilter } from '@nestjs/core/exceptions/external-exception-filter';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("authentification")
 @Controller('auth')
 export class AuthentificationController {
   constructor(
@@ -33,6 +40,7 @@ export class AuthentificationController {
   connexion(@Body() connexionDto: connexionDto) {
     return this.AuthentificationService.connexion(connexionDto);
   }
+
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.AuthentificationService.resetPassword(resetPasswordDto);
@@ -47,11 +55,14 @@ export class AuthentificationController {
   }
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  deleteUser(@Param('id') id: string,@Body() deleteAccountDto: deleteAccountDto,){
-     return this.AuthentificationService.deleteUser(
-       Number(id),
-       deleteAccountDto,
-     );
+  deleteUser(
+    @Param('id') id: string,
+    @Body() deleteAccountDto: deleteAccountDto,
+  ) {
+    return this.AuthentificationService.deleteUser(
+      Number(id),
+      deleteAccountDto,
+    );
   }
-  }
+}
 

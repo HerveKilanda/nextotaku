@@ -96,6 +96,8 @@ export class AuthentificationService {
       },
     };
   }
+
+
   /**
    * Réinitialise le mot de passe de l'utilisateur et envoie un e-mail contenant un code de réinitialisation.
    * @param ResetPasswordDto Objet contenant l'e-mail de l'utilisateur pour la réinitialisation du mot de passe.
@@ -153,9 +155,9 @@ export class AuthentificationService {
     const { email, password, code } = ResetPasswordConfirmationDto;
 
     // Recherche de l'utilisateur dans la base de données par e-mail
-     const user = await this.prismaService.user.findFirst({
-       where: { email: email },
-     });
+    const user = await this.prismaService.user.findFirst({
+      where: { email: email },
+    });
 
     // Vérification si l'utilisateur existe
     if (!user) {
