@@ -16,10 +16,12 @@ import {
 import { CreateEmpruntDto } from './dto/create-emprunt.dto';
 import { UpdateEmpruntDto } from './dto/update-emprunt.dto';
 import { EmpruntService } from './emprunt.service';
-import { Emprunt } from '@prisma/client';
+import { Emprunt, Role } from '@prisma/client';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/authentification/role.decorateur';
+import { AdminGuard } from 'src/authentification/guards';
 
 @ApiBearerAuth()
 @ApiTags('emprunt')
@@ -32,6 +34,8 @@ export class EmpruntController {
     return this.empruntService.create(createEmpruntDto);
   }
 
+  @Roles(Role.ADMIN) // Décorateur pour spécifier les rôles autorisés
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @UseGuards(AuthGuard('jwt'))
   @Get('all')
   async findAllEmprunt(userId: number, mangaId: number) {
@@ -46,6 +50,7 @@ export class EmpruntController {
     }
   }
 
+
   @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async updateEmprunt(
@@ -55,7 +60,8 @@ export class EmpruntController {
     return await this.empruntService.update(empruntsId, updateEmpruntDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN) // Décorateur pour spécifier les rôles autorisés
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':id')
   async delete(@Param('id') empruntsId: string) {
     return await this.empruntService.delete(Number(empruntsId));

@@ -188,7 +188,7 @@ export class AuthentificationService {
     return { data: 'Mot de passe mis à jour avec succès' };
   }
 
-  async deleteUser(userId: number, deleteAccountDto: deleteAccountDto) {
+  async deleteUser(userId: number) {
     // Recherche de l'utilisateur dans la base de données par ID
     const user = await this.prismaService.user.findUnique({
       where: { userId },
@@ -199,17 +199,7 @@ export class AuthentificationService {
       throw new NotFoundException('Utilisateur non trouvé');
     }
 
-    // Comparaison du mot de passe fourni avec le mot de passe hashé de l'utilisateur
-    const match = await bcrypt.compare(
-      deleteAccountDto.password,
-      user.password,
-    );
-    if (!match) {
-      throw new UnauthorizedException(
-        'Les mots de passe ne sont pas identiques',
-      );
-    }
-
+   
     // Suppression de l'utilisateur de la base de données
     await this.prismaService.user.delete({
       where: { userId },

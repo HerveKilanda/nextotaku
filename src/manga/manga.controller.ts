@@ -15,6 +15,9 @@ import { UpdateMangaDto } from './dto/update-manga.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AdminGuard } from 'src/authentification/guards';
+import { Roles } from 'src/authentification/role.decorateur';
+import { Role } from '@prisma/client';
 
 @ApiBearerAuth()
 @ApiTags('manga')
@@ -28,7 +31,8 @@ export class MangaController {
    * @param req L'objet Request pour récupérer l'ID de l'utilisateur à partir du token JWT.
    * @returns Le manga créé avec succès.
    */
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN) // Décorateur pour spécifier les rôles autorisés
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Post('creation')
   async createManga(
     @Body() createMangaDto: CreateMangaDto,
@@ -64,7 +68,8 @@ export class MangaController {
    * @param updateMangaDto Les données mises à jour du manga.
    * @returns Le manga mis à jour avec succès.
    */
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN) // Décorateur pour spécifier les rôles autorisés
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Patch(':id')
   updateManga(@Param('id') id: string, @Body() updateMangaDto: UpdateMangaDto) {
     return this.mangaService.updateManga(+id, updateMangaDto);
@@ -75,7 +80,8 @@ export class MangaController {
    * @param mangaId L'ID du manga à supprimer.
    * @returns Un message indiquant si le manga a été supprimé avec succès.
    */
-  @UseGuards(AuthGuard('jwt'))
+  @Roles(Role.ADMIN) // Décorateur pour spécifier les rôles autorisés
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Delete(':id')
   remove(@Param('id') mangaId: string) {
     return this.mangaService.remove(Number(mangaId));

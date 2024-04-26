@@ -24,8 +24,11 @@ import { request, Request } from 'express';
 import { deleteAccountDto } from './dto/deleteAccount';
 import { ExternalExceptionFilter } from '@nestjs/core/exceptions/external-exception-filter';
 import { ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
+ // Assurez-vous que le chemin d'importation est correct
 
-@ApiTags("authentification")
+
+@ApiTags('authentification')
 @Controller('auth')
 export class AuthentificationController {
   constructor(
@@ -36,6 +39,7 @@ export class AuthentificationController {
   inscrption(@Body() inscriptionDto: inscriptionDto) {
     return this.AuthentificationService.inscription(inscriptionDto);
   }
+
   @Post('connexion')
   connexion(@Body() connexionDto: connexionDto) {
     return this.AuthentificationService.connexion(connexionDto);
@@ -45,6 +49,7 @@ export class AuthentificationController {
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.AuthentificationService.resetPassword(resetPasswordDto);
   }
+
   @Post('reset-password-confirmation')
   resetPasswordConfirmation(
     @Body() resetPasswordConfirmationDto: ResetPasswordConfirmationDto,
@@ -53,16 +58,11 @@ export class AuthentificationController {
       resetPasswordConfirmationDto,
     );
   }
+
+   // Décorateur pour spécifier les rôles autorisés
+  @UseGuards(AuthGuard('jwt')) // Utilisation de plusieurs gardes
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
-  deleteUser(
-    @Param('id') id: string,
-    @Body() deleteAccountDto: deleteAccountDto,
-  ) {
-    return this.AuthentificationService.deleteUser(
-      Number(id),
-      deleteAccountDto,
-    );
+  deleteUser(@Param('id', ParseIntPipe) userId: number) {
+    return this.AuthentificationService.deleteUser(Number(userId));
   }
 }
-

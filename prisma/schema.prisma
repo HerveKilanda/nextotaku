@@ -15,12 +15,12 @@ datasource db {
 model Manga {
   mangaId   Int      @id @default(autoincrement())
   titre       String   @db.VarChar(100)
-  categorie   categorie @relation(fields: [categorieId], references: [categorieId])
+  categorie   categorie @relation(fields: [categorieId], references: [categorieId], onDelete: Cascade)
   categorieId Int
   emprunts    Emprunt[]
   status    Status   @default(LIBRE)
   description String @db.Text()
-  users      User     @relation(fields: [userId], references: [userId])
+  users      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId      Int
 }
 
@@ -32,9 +32,9 @@ model categorie {
 
 model Emprunt {
   empruntsId Int    @id @default(autoincrement())
-  manga      Manga  @relation(fields: [mangaId], references: [mangaId])
+  manga      Manga  @relation(fields: [mangaId], references: [mangaId], onDelete: Cascade)
   mangaId    Int
-  user       User   @relation(fields: [userId], references: [userId])
+  user       User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId     Int
    dateDebut  DateTime @default(now())
   dateFin    DateTime 
@@ -48,14 +48,18 @@ model User {
   password String @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  emprunts Emprunt[]
+  emprunts Emprunt[] 
   mangas   Manga[]
+  role    Role  @default(USER)
 }
 
+enum Role {
+  ADMIN
+  USER
+}
 enum Status {
   LIBRE
   EMPRUNTE
 }
-
 
 
