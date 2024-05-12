@@ -6,8 +6,9 @@ import { JwtModule } from '@nestjs/jwt';
 
 
 
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
     const config = new DocumentBuilder()
       .setTitle('Otakulinks API')
       .setDescription('Otakulinks description')
@@ -16,6 +17,11 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
      app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+     app.enableCors({
+       origin: ['http://localhost:3000'],
+       credentials: true,
+       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+     });
+  await app.listen(8000);
 }
 bootstrap();

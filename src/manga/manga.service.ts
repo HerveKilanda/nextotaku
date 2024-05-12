@@ -1,14 +1,15 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Status } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMangaDto } from './dto/create-manga.dto';
 import { UpdateMangaDto } from './dto/update-manga.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { Manga } from './entities/manga.entity';
-import { Status } from '@prisma/client';
 
 @Injectable()
 export class MangaService {
@@ -21,9 +22,9 @@ export class MangaService {
    * @returns Un message indiquant que le manga a été créé avec succès.
    */
   async createManga(createMangaDto: CreateMangaDto, userId: any) {
-    const { titre, description, categorieId, } = createMangaDto;
+    const { titre, description, categorieId } = createMangaDto;
     await this.prisma.manga.create({
-      data: { titre, description, categorieId, userId, },
+      data: { titre, description, categorieId, userId },
     });
     return { data: 'Manga créé' };
   }
@@ -33,16 +34,34 @@ export class MangaService {
    * @returns Tous les mangas disponibles.
    */
   async getAllManga(): Promise<Manga[]> {
-    return await this.prisma.manga.findMany({ where : {status : Status.LIBRE}});
+    try {
+      return await this.prisma.manga.findMany({
+        where: { status: Status.LIBRE },
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Echec de la récuperation des mangas',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   /**
    * Récupère un manga par son ID.
    * @param mangaId L'ID du manga à récupérer.
-   * @returns Le manga correspondant à l'ID fourni.
+   * @returns Le manga correspondant à l'ID fourni ou lance une exception si le manga n'est pas trouvé.
+   * @throws NotFoundException si le manga n'est pas trouvé.
+   * @throws BadRequestException si l'ID du manga n'est pas valide.
    */
-  async MangafindOne(mangaId: number): Promise<Manga | null> {
-    return await this.prisma.manga.findFirst({ where: { mangaId } });
+  async MangafindOne(mangaId: number): Promise<Manga> {
+    if (!Number.isInteger(mangaId) || mangaId <= 0) {
+      throw new BadRequestException('Invalid mangaId');
+    }
+    const manga = await this.prisma.manga.findUnique({ where: { mangaId } });
+    if (!manga) {
+      throw new NotFoundException(`Manga with ID ${mangaId} not found`);
+    }
+    return manga;
   }
 
   /**

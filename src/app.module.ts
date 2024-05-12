@@ -16,15 +16,15 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    
     EmpruntModule,
     MangaModule,
     CategorieModule,
     AuthentificationModule,
     PrismaModule,
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     MailerModule,
-    JwtModule
+    JwtModule,
+  
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
