@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  
 } from '@nestjs/common';
 import { inscriptionDto } from './dto/inscription';
 import * as bcrypt from 'bcrypt';
@@ -19,6 +20,7 @@ import { ResetPasswordDto } from './dto/resetPassword';
 import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation';
 import { Prisma } from '@prisma/client';
 import { deleteAccountDto } from './dto/deleteAccount';
+import { UpdateAuthentificationDto } from './dto/update-authentification.dto';
 
 @Injectable()
 export class AuthentificationService {
@@ -64,6 +66,7 @@ export class AuthentificationService {
     // Retour d'un message de succès
     return "L'utilisateur a bien été enregistré";
   }
+
   async connexion(connexionDto: connexionDto) {
     const { email, password } = connexionDto;
     const user = await this.prismaService.user.findFirst({
@@ -96,7 +99,6 @@ export class AuthentificationService {
       },
     };
   }
-
 
   /**
    * Réinitialise le mot de passe de l'utilisateur et envoie un e-mail contenant un code de réinitialisation.
@@ -143,6 +145,7 @@ export class AuthentificationService {
       data: 'Le code de renouvellement de votre mot de passe a été envoyé',
     };
   }
+
   /**
    * Réinitialise le mot de passe de l'utilisateur après vérification du code OTP.
    * @param ResetPasswordConfirmationDto Objet contenant les informations de réinitialisation de mot de passe.
@@ -188,6 +191,39 @@ export class AuthentificationService {
     return { data: 'Mot de passe mis à jour avec succès' };
   }
 
+  async updateUser(id : number , UpdateAuthentificationDto: UpdateAuthentificationDto) {
+    
+    const {password, username, email} = UpdateAuthentificationDto
+
+    // Check if the user exists
+    const user = await this.prismaService.user.findUnique({
+      where: { userId: id },
+    });
+
+    // Throw NotFoundException if user does not exist
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+
+    try {
+      const hash = await bcrypt.hash(password, 10);
+      const userUpdate = await this.prismaService.user.update({
+        where: { userId: id },
+        data: {
+          email : email , 
+          username : username,
+          password : hash
+        },
+      });
+      return { 
+        message : "l'utilisateur à été mise à jour",
+        data : UpdateAuthentificationDto
+       };
+    } catch (error) {
+      throw new HttpException('Echec de la modification', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async deleteUser(userId: number) {
     // Recherche de l'utilisateur dans la base de données par ID
     const user = await this.prismaService.user.findUnique({
@@ -199,7 +235,6 @@ export class AuthentificationService {
       throw new NotFoundException('Utilisateur non trouvé');
     }
 
-   
     // Suppression de l'utilisateur de la base de données
     await this.prismaService.user.delete({
       where: { userId },
