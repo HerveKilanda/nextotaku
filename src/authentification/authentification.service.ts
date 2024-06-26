@@ -85,20 +85,20 @@ export class AuthentificationService {
     const payload = {
       sub: user.userId,
       email: user.email,
+      username:user.username,
+      role: user.role
+
     };
 
     const token = this.JwtService.sign(payload, {
       expiresIn: '2h',
-      secret: this.ConfigService.get('SECRET_KEY'),
+      secret: this.ConfigService.get('JWT_SECRET'),
     });
-    return {
-      token,
-      user: {
-        user: user.username,
-        email: user.email,
-      },
-    };
+      return {
+        token
+      };
   }
+
 
   /**
    * Réinitialise le mot de passe de l'utilisateur et envoie un e-mail contenant un code de réinitialisation.
@@ -242,4 +242,6 @@ export class AuthentificationService {
 
     return { data: 'Le compte a été supprimé' };
   }
+
+  
 }

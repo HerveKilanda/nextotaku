@@ -19,6 +19,7 @@ model Manga {
   categorieId Int
   emprunts    Emprunt[]
   status    Status   @default(LIBRE)
+  imageUrl    String    @db.VarChar(255)  // 
   description String @db.Text()
   users      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId      Int

@@ -2,9 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import session from 'express-session'; // Importation par défaut d'express-session
-import MySQLStoreFactory from 'express-mysql-session'; // Importation correcte de MySQLStore
+// import session from 'express-session'; // Importation par défaut d'express-session
+import * as MySQLStoreFactory from 'express-mysql-session';
 import { localsData } from './middlewares/localData';
+const session = require('express-session');
+import * as cookieParser from 'cookie-parser'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -31,26 +33,35 @@ async function bootstrap() {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'root',
     database: 'nextotaku',
   };
 
   // Initialisation de MySQLStore avec la fonction session
-  const MySQLStore = MySQLStoreFactory(session);
-  const store = new MySQLStore(options);
+  // const MySQLStore = MySQLStoreFactory(session);
+  // const store = new MySQLStore(options);
+  const MySQLStore = require('express-mysql-session')(session);
+  const sessionStore = new MySQLStore(options);
 
   app.use(localsData);
   // Configuration des sessions avec express-session et MySQLStore
-  app.use(
-    session({
-      secret: 'my-secret',
-      resave: false,
-      saveUninitialized: false,
-      store: store,
-    }),
-  );
+  app.use(session({
+    key: 'session_cookie_name',
+    secret: 'session_cookie_secret',
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false
+  }));
 
+  sessionStore.onReady().then(() => {
+    // MySQL session store ready for use.
+    console.log('MySQLStore ready');
+  }).catch(error => {
+    // Something went wrong.
+    console.error(error);
+  });
+  app.use(cookieParser());
   await app.listen(8000);
 }
 
 bootstrap();
+

@@ -12,4 +12,6 @@ export class CreateMangaDto {
   readonly userId: number;
 
   readonly categorieId: number;
+
+  readonly imageUrl: string;
 }

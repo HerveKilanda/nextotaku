@@ -31,6 +31,9 @@ import { ExternalExceptionFilter } from '@nestjs/core/exceptions/external-except
 import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { userInfo } from 'os';
+import { localsData } from 'src/middlewares/localData';
+import {  SessionData } from 'express-session';
+
  // Assurez-vous que le chemin d'importation est correct
 
 
@@ -48,17 +51,28 @@ export class AuthentificationController {
   }
 
   @Post('connexion')
-  async connexion(
-    @Body() connexionDto: connexionDto,
-    @Session() session: Record<string, any>,
-  ) {
-    // session.visits = session.visits ? session.visits + 1 : 1;
-    const user = await this.AuthentificationService.connexion(connexionDto);
-    session.user = user;
-    session.connected = true;
-    return session;
-    // return this.AuthentificationService.connexion(connexionDto);
+  async connexion(@Body() connexionDto: connexionDto, @Res() res: Response) {
+    try {
+      const user = await this.AuthentificationService.connexion(connexionDto);
+
+      res.cookie('token', user.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 2 * 60 * 60 * 1000, // 2 heures
+        sameSite: 'strict',
+      });
+
+
+      return res.json({
+        message: 'Connexion réussie',
+        
+
+      });
+    } catch (error) {
+      throw new HttpException('Connexion échouée', HttpStatus.UNAUTHORIZED);
+    }
   }
+  
 
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
@@ -106,4 +120,19 @@ export class AuthentificationController {
   deleteUser(@Param('id', ParseIntPipe) userId: number) {
     return this.AuthentificationService.deleteUser(Number(userId));
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('user')
+  getUserConnected(@Req() req: Request) {
+    if (!req.user) {
+      throw new HttpException('Utilisateur non authentifié', HttpStatus.UNAUTHORIZED);
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Utilisateur connecté',
+      data: req.user,
+    };
+  }
+  
 }

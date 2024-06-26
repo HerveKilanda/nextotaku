@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EmpruntModule } from './emprunt/emprunt.module';
@@ -10,6 +10,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from './mailer/mailer.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtCookieMiddleware } from 'middleware/jwt.cookie.middleware';
+import { HttpModule } from '@nestjs/axios';
 
 
 
@@ -24,9 +26,14 @@ import { JwtModule } from '@nestjs/jwt';
     ConfigModule.forRoot({ isGlobal: true }),
     MailerModule,
     JwtModule,
+    HttpModule
   
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtCookieMiddleware).forRoutes("*")
+  }
+}
