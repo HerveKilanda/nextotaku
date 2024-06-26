@@ -81,7 +81,7 @@ export class MangaController {
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @Get('fetch-and-store')
-  async fetchAndStoreMangas(@Req() req: Request) {
+  async fetchAndStoreMangas(@Req() req: Request): Promise<Manga[]> {
     const userId = req.user['userId'];
     if (!userId) {
       throw new NotFoundException("L'utilisateur de n'a pas été trouvé");
@@ -99,17 +99,18 @@ export class MangaController {
     return manga;
   }
 
-  /**
+   /**
    * Récupère les détails d'un manga par son ID.
    * @param mangaId L'ID du manga à récupérer.
    * @returns Le manga correspondant à l'ID fourni.
    */
-  @Get(':id')
-  async fetchMangaById(@Param('id') mangaId: string): Promise<any> {
-    const manga = await this.mangaService.fetchMangaById(Number(mangaId));
-    if (!manga) {
-      throw new NotFoundException(`Manga avec l'ID ${mangaId} non trouvé`);
-    }
-    return manga;
-  }
+   @Get(':id')
+   async fetchMangaById(@Param('id') mangaId: string): Promise<any> {
+     const manga = await this.mangaService.fetchMangaById(Number(mangaId));
+     if (!manga) {
+       throw new NotFoundException(`Manga avec l'ID ${mangaId} non trouvé`);
+     }
+     return manga;
+   }
+
 }
